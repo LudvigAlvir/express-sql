@@ -3,12 +3,14 @@ import cors from "cors";
 import mysql from "mysql2/promise";
 
 const connection = await mysql.createConnection({
-  host: "0",
-  database: "0",
-  user: "0",
-  password: "0",
-  port: 0,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
+
+const port = process.env.PORT || 3000;
 
 const app = express();
 
@@ -60,6 +62,31 @@ app.get("/post", async (req, res) => {
   res.json(result);
 });
 
-app.listen(3000, () => {
-  console.log("Server started");
+app.get("/test", async (req, res) => {
+  const sort = req.query.sort || "id";
+  const sortOrder = req.query.sortOrder || "ASC";
+  //http://localhost:1337/test?sort=id&sortOrder=DESC
+  const [result] = await connection.query(
+    `SELECT * FROM test ORDER BY ${sort} ${sortOrder}`
+  );
+  res.json(result);
+});
+
+app.get("/test/:id", async (req, res) => {
+  const { id } = req.params;
+  const [result] = await connection.query("SELECT * FROM test WHERE id=" + id);
+  res.json(result);
+});
+
+app.post("/test", async (req, res) => {
+  const { content } = req.body;
+  const [result] = await connection.query(
+    `INSERT INTO test(content) VALUES (?);`,
+    [content]
+  );
+  res.send("success");
+});
+
+app.listen(port, () => {
+  console.log("Server started on port: ", port);
 });

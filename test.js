@@ -1,19 +1,13 @@
-const data = {
-  id: 1,
-  title: "title",
-  content: "hello",
-};
+async function postTest() {
+  const res = await fetch("http://localhost:1337/test", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ content: `Første fra node'; DROP TABLE test;` }),
+  });
+  const data = await res.text();
+  console.log(data);
+}
 
-/* const { title, content } = data; */
-const title = data.title;
-const content = data.content;
-const id = data.id;
-
-console.log(title, content);
-
-const arr = [1, 2, 4, 8];
-const [first, second, third] = arr;
-
-console.log(first, second, third);
-
-const query = "1; DROP TABLE user;";
+postTest();
